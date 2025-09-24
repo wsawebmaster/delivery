@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,20 +16,17 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
         h1 {
             text-align: center;
             color: #2c3e50;
             margin-bottom: 20px;
         }
-
         #menu {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
             flex-grow: 1;
         }
-
         .menu-item {
             background: #fff;
             border-radius: 8px;
@@ -39,18 +35,15 @@
             text-align: center;
             transition: transform 0.3s;
         }
-
         .menu-item:hover {
             transform: translateY(-5px);
         }
-
         .quantity-controls {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 10px;
         }
-
         .quantity-controls button {
             background-color: #3498db;
             color: white;
@@ -61,11 +54,9 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
         .quantity-controls button:hover {
             background-color: #2980b9;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -78,7 +69,6 @@
             align-items: center;
             z-index: 1000;
         }
-
         .modal-content {
             background: #fff;
             padding: 20px;
@@ -87,7 +77,6 @@
             max-width: 500px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
         .close-button {
             background-color: #e74c3c;
             color: white;
@@ -97,17 +86,14 @@
             cursor: pointer;
             float: right;
         }
-
         .close-button:hover {
             background-color: #c0392b;
         }
-
         .total {
             font-weight: bold;
             font-size: 1.2em;
             margin-top: 10px;
         }
-
         button.finalize {
             background-color: #e74c3c;
             color: white;
@@ -121,11 +107,9 @@
             width: 100%;
             transition: background-color 0.3s;
         }
-
         button.finalize:hover {
             background-color: #c0392b;
         }
-
         .bottom-menu {
             display: none;
             position: fixed;
@@ -138,12 +122,13 @@
             justify-content: space-between;
             align-items: center;
         }
-
+        .bottom-menu.show {
+            display: flex; /* Exibe quando a classe 'show' é adicionada */
+        }
         .total-value {
             font-size: 1.2em;
             color: #2c3e50;
         }
-
         .cart-button {
             background-color: #3498db;
             color: white;
@@ -154,15 +139,12 @@
             transition: background-color 0.3s;
             display: none;
         }
-
         .cart-button.show {
             display: inline-block;
         }
-
         .cart-button:hover {
             background-color: #2980b9;
         }
-
         .input-field {
             margin-top: 10px;
             margin-bottom: 10px;
@@ -171,7 +153,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-
         .bairro-list {
             margin-top: 10px;
             max-height: 200px;
@@ -183,253 +164,300 @@
         }
     </style>
 </head>
-
 <body>
 
-    <h1>Cardápio de Lanches</h1>
+<h1>Cardápio de Lanches</h1>
 
-    <section id="menu">
-        <div class="menu-item">
-            <div class="quantity-controls">
-                <button onclick="changeQuantity('X Burguêr', 12, -1)">-</button>
-                <span id="quantity-X Burguêr">0</span>
-                <button onclick="changeQuantity('X Burguêr', 12, 1)">+</button>
-            </div>
-            <strong>X Burguêr</strong> - R$ 12,00
+<section id="menu">
+    <div class="menu-item">
+        <div class="quantity-controls">
+            <button onclick="changeQuantity('X Burguêr', 12, -1)">-</button>
+            <span id="quantity-X Burguêr">0</span>
+            <button onclick="changeQuantity('X Burguêr', 12, 1)">+</button>
         </div>
-        <div class="menu-item">
-            <div class="quantity-controls">
-                <button onclick="changeQuantity('X Egg Bacon', 16, -1)">-</button>
-                <span id="quantity-X Egg Bacon">0</span>
-                <button onclick="changeQuantity('X Egg Bacon', 16, 1)">+</button>
-            </div>
-            <strong>X Egg Bacon</strong> - R$ 16,00
-        </div>
-        <div class="menu-item">
-            <div class="quantity-controls">
-                <button onclick="changeQuantity('X Salada', 17, -1)">-</button>
-                <span id="quantity-X Salada">0</span>
-                <button onclick="changeQuantity('X Salada', 17, 1)">+</button>
-            </div>
-            <strong>X Salada</strong> - R$ 17,00
-        </div>
-        <div class="menu-item">
-            <div class="quantity-controls">
-                <button onclick="changeQuantity('X Salada Egg', 20, -1)">-</button>
-                <span id="quantity-X Salada Egg">0</span>
-                <button onclick="changeQuantity('X Salada Egg', 20, 1)">+</button>
-            </div>
-            <strong>X Salada Egg</strong> - R$ 20,00
-        </div>
-        <div class="menu-item">
-            <div class="quantity-controls">
-                <button onclick="changeQuantity('X Tudo', 28, -1)">-</button>
-                <span id="quantity-X Tudo">0</span>
-                <button onclick="changeQuantity('X Tudo', 28, 1)">+</button>
-            </div>
-            <strong>X Tudo</strong> - R$ 28,00
-        </div>
-    </section>
-
-    <div class="modal" id="cartModal">
-        <div class="modal-content">
-            <button class="close-button" onclick="closeModal()">Fechar</button>
-            <h2>Seu Carrinho</h2>
-            <ul id="cartItems"></ul>
-            <div id="bairroInfo"></div>
-            <div class="total" id="totalValue">Total dos Itens: R$ 0,00</div>
-            <div class="total" id="freteValue">Valor da Entrega: R$ 0,00</div>
-            <div class="total" id="finalTotal">Total Geral: R$ 0,00</div>
-
-            <button onclick="exibirBairrosAtendidos()">Bairros Atendidos</button>
-            <div id="bairroList" class="bairro-list" style="display: none;">
-                <h4>Bairros Atendidos:</h4>
-                <ul>
-                    <li>Jardim Antártica</li>
-                    <li>Vila Tibério</li>
-                    <li>Jardim Paiva</li>
-                </ul>
-            </div>
-
-            <input type="text" id="cepInput" class="input-field" placeholder="Informe seu CEP"
-                onblur="buscarEndereco()" />
-            <div id="enderecoInfo" class="input-field" style="margin-top: 10px; display: none;"></div>
-            <input type="text" id="numeroInput" class="input-field" placeholder="Número da Residência" />
-            <input type="text" id="pontoReferenciaInput" class="input-field" placeholder="Ponto de Referência" />
-
-            <input type="text" id="clienteNome" class="input-field" placeholder="Seu Nome" />
-            <input type="text" id="clienteTelefone" class="input-field" placeholder="Seu Telefone" />
-
-            <select id="formaPagamento" class="input-field">
-                <option value="" disabled selected>Selecione a forma de pagamento</option>
-                <option value="Pix">Pix</option>
-                <option value="Dinheiro">Dinheiro</option>
-                <option value="Cartão">Cartão</option>
-            </select>
-
-
-            <button class="finalize" onclick="finalizeOrder()">Finalizar Pedido</button>
-        </div>
+        <strong>X Burguêr</strong> - R$ 12,00
     </div>
-
-    <div class="bottom-menu" id="bottomMenu">
-        <div class="total-value" id="bottomTotalValue">Subtotal: R$ 0,00</div>
-        <button class="cart-button" id="cartButton" onclick="toggleCart()">Carrinho</button>
+    <div class="menu-item">
+        <div class="quantity-controls">
+            <button onclick="changeQuantity('X Egg Bacon', 16, -1)">-</button>
+            <span id="quantity-X Egg Bacon">0</span>
+            <button onclick="changeQuantity('X Egg Bacon', 16, 1)">+</button>
+        </div>
+        <strong>X Egg Bacon</strong> - R$ 16,00
     </div>
+    <div class="menu-item">
+        <div class="quantity-controls">
+            <button onclick="changeQuantity('X Salada', 17, -1)">-</button>
+            <span id="quantity-X Salada">0</span>
+            <button onclick="changeQuantity('X Salada', 17, 1)">+</button>
+        </div>
+        <strong>X Salada</strong> - R$ 17,00
+    </div>
+    <div class="menu-item">
+        <div class="quantity-controls">
+            <button onclick="changeQuantity('X Salada Egg', 20, -1)">-</button>
+            <span id="quantity-X Salada Egg">0</span>
+            <button onclick="changeQuantity('X Salada Egg', 20, 1)">+</button>
+        </div>
+        <strong>X Salada Egg</strong> - R$ 20,00
+    </div>
+    <div class="menu-item">
+        <div class="quantity-controls">
+            <button onclick="changeQuantity('X Tudo', 28, -1)">-</button>
+            <span id="quantity-X Tudo">0</span>
+            <button onclick="changeQuantity('X Tudo', 28, 1)">+</button>
+        </div>
+        <strong>X Tudo</strong> - R$ 28,00
+    </div>
+</section>
 
-    <script>
-        let cart = [];
-        let total = 0;
-        let bairroValor = 0;
-        let bairroNome = "";
-        let enderecoBase = "";
+<div class="modal" id="cartModal">
+    <div class="modal-content">
+        <button class="close-button" onclick="closeModal()">Fechar</button>
+        <h2>Seu Carrinho</h2>
+        <ul id="cartItems"></ul>
+        <div id="bairroInfo"></div>
+        <div class="total" id="totalValue">Total dos Itens: R$ 0,00</div>
+        <div class="total" id="freteValue">Valor da Entrega: R$ 0,00</div>
+        <div class="total" id="finalTotal">Total Geral: R$ 0,00</div>
+        
+        <button onclick="exibirBairrosAtendidos()">Bairros Atendidos</button>
+        <div id="bairroList" class="bairro-list" style="display: none;">
+            <h4>Bairros Atendidos:</h4>
+            <ul>
+                <li>Jardim Antártica</li>
+                <li>Vila Tibério</li>
+                <li>Jardim Paiva</li>
+            </ul>
+        </div>
 
-        function changeQuantity(name, price, change) {
-            const quantityElement = document.getElementById(`quantity-${name}`);
-            let quantity = parseInt(quantityElement.textContent) || 0;
-            quantity += change;
+        <input type="text" id="cepInput" class="input-field" placeholder="Informe seu CEP" onblur="buscarEndereco()" />
+        <div id="enderecoInfo" class="input-field" style="margin-top: 10px; display: none;"></div>
+        <input type="text" id="numeroInput" class="input-field" placeholder="Número da Residência" />
+        <input type="text" id="pontoReferenciaInput" class="input-field" placeholder="Ponto de Referência" />
+        
+        <input type="text" id="clienteNome" class="input-field" placeholder="Seu Nome" />
+        <input type="text" id="clienteTelefone" class="input-field" placeholder="Seu Telefone" />
 
-            if (quantity < 0) quantity = 0;
-            quantityElement.textContent = quantity;
+        <select id="formaPagamento" class="input-field">
+            <option value="" disabled selected>Selecione a forma de pagamento</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão">Cartão</option>
+        </select>
 
-            if (quantity > 0) {
-                const existingItem = cart.find(item => item.name === name);
-                if (existingItem) {
-                    existingItem.quantity = quantity;
+        <button class="finalize" onclick="finalizeOrder()">Finalizar Pedido</button>
+    </div>
+</div>
+
+<div class="bottom-menu" id="bottomMenu">
+    <div class="total-value" id="bottomTotalValue">Subtotal: R$ 0,00</div>
+    <button class="cart-button" id="cartButton" onclick="toggleCart()">Carrinho</button>
+</div>
+
+<script>
+    // Variáveis de estado global (reduzidas e essenciais)
+    let cart = [];
+    let total = 0;
+    let bairroValor = 0;
+    let bairroNome = "";
+    let enderecoBase = "";
+    let lastCep = null; // Para evitar buscas repetidas
+
+    // Funções de manipulação do carrinho e da UI
+    function changeQuantity(name, price, change) {
+        const quantityElement = document.getElementById(`quantity-${name}`);
+        let quantity = parseInt(quantityElement.textContent) || 0;
+        quantity += change;
+
+        if (quantity < 0) quantity = 0;
+        quantityElement.textContent = quantity;
+
+        if (quantity > 0) {
+            const existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity = quantity;
+            } else {
+                cart.push({ name, price, quantity });
+            }
+        } else {
+            cart = cart.filter(item => item.name !== name);
+        }
+        
+        updateUI();
+    }
+
+    // Função principal para atualizar toda a interface do usuário
+    function updateUI() {
+        updateCartItems();
+        updateTotals();
+        toggleCartButton();
+    }
+
+    // Funções de responsabilidade única para a UI
+    function updateCartItems() {
+        const cartItems = document.getElementById('cartItems');
+        cartItems.innerHTML = '';
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            const li = document.createElement('li');
+            li.textContent = `${item.quantity} x ${item.name} - R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
+            cartItems.appendChild(li);
+        });
+    }
+
+    function updateTotals() {
+        total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        document.getElementById('totalValue').textContent = `Total dos Itens: R$ ${total.toFixed(2).replace('.', ',')}`;
+        document.getElementById('freteValue').textContent = `Valor da Entrega: R$ ${bairroValor.toFixed(2).replace('.', ',')}`;
+        const finalTotal = total + bairroValor;
+        document.getElementById('finalTotal').textContent = `Total Geral: R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+        document.getElementById('bottomTotalValue').textContent = `Subtotal: R$ ${total.toFixed(2).replace('.', ',')}`;
+    }
+
+    function toggleCartButton() {
+        const cartButton = document.getElementById('cartButton');
+        const bottomMenu = document.getElementById('bottomMenu');
+        if (cart.length > 0) {
+            cartButton.classList.add('show');
+            bottomMenu.classList.add('show'); 
+        } else {
+            cartButton.classList.remove('show');
+            bottomMenu.classList.remove('show');
+        }
+    }
+
+    // Funções de endereço e finalização do pedido
+    function buscarEndereco() {
+        const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
+        if (cep.length !== 8 || cep === lastCep) {
+            return;
+        }
+        lastCep = cep;
+
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.erro) {
+                    alert("CEP não encontrado.");
+                    resetAddressInfo();
                 } else {
-                    cart.push({ name, price, quantity });
+                    bairroNome = data.bairro;
+                    const bairrosValidos = ["Jardim Antártica", "Vila Tibério", "Jardim Paiva"];
+                    if (!bairrosValidos.includes(bairroNome)) {
+                        alert("Não entregamos no bairro informado.");
+                        resetAddressInfo();
+                    } else {
+                        bairroValor = 5;
+                        enderecoBase = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+                        const enderecoInfo = document.getElementById('enderecoInfo');
+                        enderecoInfo.textContent = enderecoBase;
+                        enderecoInfo.style.display = 'block';
+                        document.getElementById('bairroInfo').textContent = `Bairro: ${bairroNome}`;
+                    }
                 }
-                document.getElementById('cartButton').classList.add('show');
-                document.getElementById('bottomMenu').style.display = 'flex';
-            } else {
-                cart = cart.filter(item => item.name !== name);
-                if (cart.length === 0) {
-                    document.getElementById('cartButton').classList.remove('show');
-                    document.getElementById('bottomMenu').style.display = 'none';
-                }
-            }
-
-            updateCart();
-        }
-
-        function updateCart() {
-            const cartItems = document.getElementById('cartItems');
-            cartItems.innerHTML = '';
-            total = 0;
-
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                const li = document.createElement('li');
-                li.textContent = `${item.quantity} x ${item.name} - R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
-                cartItems.appendChild(li);
+                updateUI();
+            })
+            .catch(error => {
+                console.error("Erro ao buscar o endereço:", error);
+                alert("Erro ao buscar o endereço. Verifique o CEP.");
+                resetAddressInfo();
+                updateUI();
             });
+    }
 
-            const freteElement = document.getElementById('freteValue');
-            if (bairroNome) {
-                freteElement.textContent = `Valor da Entrega: R$ ${bairroValor.toFixed(2).replace('.', ',')}`;
-            } else {
-                freteElement.textContent = `Valor da Entrega: R$ 0,00`;
-            }
+    function resetAddressInfo() {
+        bairroNome = "";
+        bairroValor = 0;
+        enderecoBase = "";
+        document.getElementById('enderecoInfo').style.display = 'none';
+        document.getElementById('bairroInfo').textContent = '';
+        document.getElementById('cepInput').value = '';
+    }
 
-            document.getElementById('totalValue').textContent = `Total dos Itens: R$ ${total.toFixed(2).replace('.', ',')}`;
-            updateFinalTotal();
+    function exibirBairrosAtendidos() {
+        const bairroList = document.getElementById('bairroList');
+        bairroList.style.display = bairroList.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function finalizeOrder() {
+        if (!validateOrder()) {
+            return;
         }
 
-        function buscarEndereco() {
-            const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
-            if (cep.length === 8) {
-                fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.erro) {
-                            alert("CEP não encontrado.");
-                        } else {
-                            bairroNome = data.bairro;
-                            const bairrosValidos = ["Jardim Antártica", "Vila Tibério", "Jardim Paiva"];
-                            if (!bairrosValidos.includes(bairroNome)) {
-                                alert("Não entregamos no bairro informado.");
-                                bairroNome = "";
-                                bairroValor = 0; // Adicione esta linha para zerar o valor se o bairro não for atendido
-                                document.getElementById('enderecoInfo').style.display = 'none';
-                            } else {
-                                document.getElementById('bairroInfo').textContent = `Bairro: ${bairroNome}`;
-                                bairroValor = 5;
-                                enderecoBase = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
-                                const enderecoInfo = document.getElementById('enderecoInfo');
-                                enderecoInfo.textContent = enderecoBase;
-                                enderecoInfo.style.display = 'block';
-                            }
-                            // ✅ AQUI É O PONTO CHAVE: CHAME updateCart() AQUI!
-                            updateCart();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Erro ao buscar o endereço:", error);
-                        alert("Erro ao buscar o endereço. Verifique o CEP.");
-                    });
-            } else {
-                alert("Por favor, informe um CEP válido.");
-            }
+        const message = buildWhatsAppMessage();
+        const whatsappLink = `https://api.whatsapp.com/send?phone=5511982470496&text=${encodeURIComponent(message)}`;
+        window.open(whatsappLink, '_blank');
+    }
+
+    function validateOrder() {
+        if (cart.length === 0) {
+            alert("Seu carrinho está vazio!");
+            return false;
         }
-
-        function exibirBairrosAtendidos() {
-            const bairroList = document.getElementById('bairroList');
-            bairroList.style.display = bairroList.style.display === 'none' ? 'block' : 'none';
+        if (bairroValor === 0) {
+            alert("Por favor, informe um CEP para calcular a entrega.");
+            return false;
         }
-
-        function updateFinalTotal() {
-            const finalTotal = total + bairroValor;
-            document.getElementById('finalTotal').textContent = `Total Geral: R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-            document.getElementById('bottomTotalValue').textContent = `Subtotal: R$ ${total.toFixed(2).replace('.', ',')}`;
+        const clienteNome = document.getElementById('clienteNome').value;
+        const clienteTelefone = document.getElementById('clienteTelefone').value;
+        const numeroResidencia = document.getElementById('numeroInput').value;
+        const formaPagamento = document.getElementById('formaPagamento').value;
+        if (!clienteNome || !clienteTelefone || !numeroResidencia || !formaPagamento) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return false;
         }
+        return true;
+    }
 
-        function finalizeOrder() {
-            if (cart.length === 0) {
-                alert("Seu carrinho está vazio!");
-                return;
-            }
+    function buildWhatsAppMessage() {
+        const pontoReferencia = document.getElementById('pontoReferenciaInput').value;
+        const numeroResidencia = document.getElementById('numeroInput').value;
+        const clienteTelefone = document.getElementById('clienteTelefone').value;
+        const formaPagamento = document.getElementById('formaPagamento').value;
+        
+        const enderecoCompleto = enderecoBase.replace(",", `, ${numeroResidencia},`);
+        
+        let itemsMessage = cart.map(item => `${item.quantity} - ${item.name} - R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}`).join('\n');
+        
+        const totalItens = total.toFixed(2).replace('.', ',');
+        const totalGeral = (total + bairroValor).toFixed(2).replace('.', ',');
+        const frete = bairroValor.toFixed(2).replace('.', ',');
 
-            if (bairroValor === 0) {
-                alert("Necessário selecionar um bairro antes de finalizar o pedido.");
-                return;
-            }
+        return `*Olá, Fabin Lanches!*
+    
+✅ _Este é meu pedido de hoje:_
+    
+${itemsMessage}
+    
+Taxa de Entrega: R$ ${frete}
+🤑 *Total do Pedido: R$ ${totalGeral}*
+💳 Pagamento por: ${formaPagamento}
+    
+🛵 Endereço de entrega: 
+${enderecoCompleto}
+📍 Ponto de Referência: ${pontoReferencia}
+📞 Telefone: ${clienteTelefone}
+    
+*Aguardo ansiosamente! 😋*`;
+    }
 
-            const clienteNome = document.getElementById('clienteNome').value;
-            const clienteTelefone = document.getElementById('clienteTelefone').value;
-            const pontoReferencia = document.getElementById('pontoReferenciaInput').value;
-            const numeroResidencia = document.getElementById('numeroInput').value;
-            const formaPagamento = document.getElementById('formaPagamento').value;
+    // Funções de UI
+    function toggleCart() {
+        const modal = document.getElementById('cartModal');
+        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+    }
 
-            if (!clienteNome || !clienteTelefone || !numeroResidencia || !formaPagamento) {
-                alert("Por favor, preencha nome, telefone e número da residência e forma de pagamento..");
-                return;
-            }
-
-            const enderecoCompleto = enderecoBase.replace(",", `, ${numeroResidencia},`);
-
-
-            let message = `*Olá, Fabin Lanches!*%0A%0A✅ _Segue meu pedido de hoje:_%0A%0A`;
-            cart.forEach(item => {
-                message += `${item.quantity} - ${item.name} - R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}%0A`;
-            });
-            message += `%0ATaxa de Entrega: R$ ${bairroValor.toFixed(2).replace('.', ',')}%0A🤑 *Total do Pedido: R$ ${(total + bairroValor).toFixed(2).replace('.', ',')}*%0A💳 Pagamento por: ${formaPagamento}%0A%0A🛵 Endereço de entrega:%0A${enderecoCompleto}%0A📍 Ponto de Referência: ${pontoReferencia}%0A📞 Telefone: ${clienteTelefone}%0A%0A*Aguardo ansiosamente! 😋*`;
-
-            const whatsappLink = `https://api.whatsapp.com/send?phone=5511982470496&text=${message}`;
-            window.open(whatsappLink, '_blank');
-        }
-
-        function toggleCart() {
-            const modal = document.getElementById('cartModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-        }
-
-        function closeModal() {
-            document.getElementById('cartModal').style.display = 'none';
-        }
-    </script>
+    function closeModal() {
+        document.getElementById('cartModal').style.display = 'none';
+    }
+</script>
 </body>
-
 </html>
