@@ -123,7 +123,7 @@
             align-items: center;
         }
         .bottom-menu.show {
-            display: flex; /* Exibe quando a classe 'show' é adicionada */
+            display: flex;
         }
         .total-value {
             font-size: 1.2em;
@@ -213,31 +213,23 @@
 
 <div class="modal" id="cartModal">
     <div class="modal-content">
-        <button class="close-button" onclick="closeModal()">Fechar</button>
+        <button class="close-button" onclick="closeModal('cartModal')">Fechar</button>
         <h2>Seu Carrinho</h2>
         <ul id="cartItems"></ul>
         <div id="bairroInfo"></div>
         <div class="total" id="totalValue">Total dos Itens: R$ 0,00</div>
-        <div class="total" id="freteValue">Valor da Entrega: R$ 0,00</div>
+        <div class="total" id="entregaValue">Valor da Entrega: R$ 0,00</div>
         <div class="total" id="finalTotal">Total Geral: R$ 0,00</div>
         
-        <button onclick="exibirBairrosAtendidos()">Bairros Atendidos</button>
-        <div id="bairroList" class="bairro-list" style="display: none;">
-            <h4>Bairros Atendidos:</h4>
-            <ul>
-                <li>Jardim Antártica</li>
-                <li>Vila Tibério</li>
-                <li>Jardim Paiva</li>
-            </ul>
-        </div>
+        <button onclick="showBairrosModal()">Bairros Atendidos</button>
 
-        <input type="text" id="cepInput" class="input-field" placeholder="Informe seu CEP" onblur="buscarEndereco()" />
+        <input type="tel" id="cepInput" class="input-field" placeholder="Informe seu CEP" onblur="buscarEndereco()" />
         <div id="enderecoInfo" class="input-field" style="margin-top: 10px; display: none;"></div>
-        <input type="text" id="numeroInput" class="input-field" placeholder="Número da Residência" />
+        <input type="tel" id="numeroInput" class="input-field" placeholder="Número da Residência" />
         <input type="text" id="pontoReferenciaInput" class="input-field" placeholder="Ponto de Referência" />
         
         <input type="text" id="clienteNome" class="input-field" placeholder="Seu Nome" />
-        <input type="text" id="clienteTelefone" class="input-field" placeholder="Seu Telefone" />
+        <input type="tel" id="clienteTelefone" class="input-field" placeholder="Seu Telefone" />
 
         <select id="formaPagamento" class="input-field">
             <option value="" disabled selected>Selecione a forma de pagamento</option>
@@ -250,9 +242,21 @@
     </div>
 </div>
 
+<div class="modal" id="bairrosModal">
+    <div class="modal-content">
+        <button class="close-button" onclick="closeModal('bairrosModal')">Fechar</button>
+        <h2>Bairros Atendidos e Valores</h2>
+        <ul class="bairro-list">
+            <li>Jardim Antártica - R$ 5,00</li>
+            <li>Vila Tibério - R$ 5,00</li>
+            <li>Jardim Paiva - R$ 10,00</li>
+        </ul>
+    </div>
+</div>
+
 <div class="bottom-menu" id="bottomMenu">
     <div class="total-value" id="bottomTotalValue">Subtotal: R$ 0,00</div>
-    <button class="cart-button" id="cartButton" onclick="toggleCart()">Carrinho</button>
+    <button class="cart-button" id="cartButton" onclick="showCartModal()">Carrinho</button>
 </div>
 
 <script>
@@ -262,7 +266,7 @@
     let bairroValor = 0;
     let bairroNome = "";
     let enderecoBase = "";
-    let lastCep = null; // Para evitar buscas repetidas
+    let lastCep = null;
 
     // Funções de manipulação do carrinho e da UI
     function changeQuantity(name, price, change) {
@@ -309,7 +313,7 @@
     function updateTotals() {
         total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         document.getElementById('totalValue').textContent = `Total dos Itens: R$ ${total.toFixed(2).replace('.', ',')}`;
-        document.getElementById('freteValue').textContent = `Valor da Entrega: R$ ${bairroValor.toFixed(2).replace('.', ',')}`;
+        document.getElementById('entregaValue').textContent = `Valor da Entrega: R$ ${bairroValor.toFixed(2).replace('.', ',')}`;
         const finalTotal = total + bairroValor;
         document.getElementById('finalTotal').textContent = `Total Geral: R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
         document.getElementById('bottomTotalValue').textContent = `Subtotal: R$ ${total.toFixed(2).replace('.', ',')}`;
@@ -320,7 +324,7 @@
         const bottomMenu = document.getElementById('bottomMenu');
         if (cart.length > 0) {
             cartButton.classList.add('show');
-            bottomMenu.classList.add('show'); 
+            bottomMenu.classList.add('show');
         } else {
             cartButton.classList.remove('show');
             bottomMenu.classList.remove('show');
@@ -348,17 +352,22 @@
                     resetAddressInfo();
                 } else {
                     bairroNome = data.bairro;
-                    const bairrosValidos = ["Jardim Antártica", "Vila Tibério", "Jardim Paiva"];
-                    if (!bairrosValidos.includes(bairroNome)) {
-                        alert("Não entregamos no bairro informado.");
-                        resetAddressInfo();
-                    } else {
-                        bairroValor = 5;
+                    const bairrosValidos = {
+                        "Jardim Antártica": 5,
+                        "Vila Tibério": 5,
+                        "Jardim Paiva": 10
+                    };
+                    
+                    if (bairrosValidos.hasOwnProperty(bairroNome)) {
+                        bairroValor = bairrosValidos[bairroNome];
                         enderecoBase = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
                         const enderecoInfo = document.getElementById('enderecoInfo');
                         enderecoInfo.textContent = enderecoBase;
                         enderecoInfo.style.display = 'block';
                         document.getElementById('bairroInfo').textContent = `Bairro: ${bairroNome}`;
+                    } else {
+                        alert("Não entregamos no bairro informado.");
+                        resetAddressInfo();
                     }
                 }
                 updateUI();
@@ -380,9 +389,20 @@
         document.getElementById('cepInput').value = '';
     }
 
-    function exibirBairrosAtendidos() {
-        const bairroList = document.getElementById('bairroList');
-        bairroList.style.display = bairroList.style.display === 'none' ? 'block' : 'none';
+    // Validação de entrada para aceitar apenas números
+    function validateNumberInput(event) {
+        event.target.value = event.target.value.replace(/\D/g, '');
+    }
+
+    // Validação do telefone
+    function validatePhone(phone) {
+        const phoneRegex = /^(?:55)?(\d{2})9(\d{8})$/;
+        return phoneRegex.test(phone.replace(/\D/g, ''));
+    }
+
+    // Proteção contra SQL Injection
+    function sanitizeInput(input) {
+        return input.replace(/['";=()<>`]/g, '');
     }
 
     function finalizeOrder() {
@@ -396,6 +416,11 @@
     }
 
     function validateOrder() {
+        const clienteNome = document.getElementById('clienteNome').value;
+        const clienteTelefone = document.getElementById('clienteTelefone').value;
+        const numeroResidencia = document.getElementById('numeroInput').value;
+        const formaPagamento = document.getElementById('formaPagamento').value;
+
         if (cart.length === 0) {
             alert("Seu carrinho está vazio!");
             return false;
@@ -404,22 +429,28 @@
             alert("Por favor, informe um CEP para calcular a entrega.");
             return false;
         }
-        const clienteNome = document.getElementById('clienteNome').value;
-        const clienteTelefone = document.getElementById('clienteTelefone').value;
-        const numeroResidencia = document.getElementById('numeroInput').value;
-        const formaPagamento = document.getElementById('formaPagamento').value;
         if (!clienteNome || !clienteTelefone || !numeroResidencia || !formaPagamento) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return false;
         }
+        if (!validatePhone(clienteTelefone)) {
+            alert("Por favor, insira um telefone válido com 11 dígitos (ex: 11982470496).");
+            return false;
+        }
+        if (!numeroResidencia) {
+            alert("Por favor, preencha o número da residência.");
+            return false;
+        }
+
         return true;
     }
 
     function buildWhatsAppMessage() {
-        const pontoReferencia = document.getElementById('pontoReferenciaInput').value;
-        const numeroResidencia = document.getElementById('numeroInput').value;
-        const clienteTelefone = document.getElementById('clienteTelefone').value;
-        const formaPagamento = document.getElementById('formaPagamento').value;
+        const pontoReferencia = sanitizeInput(document.getElementById('pontoReferenciaInput').value);
+        const numeroResidencia = sanitizeInput(document.getElementById('numeroInput').value);
+        const clienteNome = sanitizeInput(document.getElementById('clienteNome').value);
+        const clienteTelefone = sanitizeInput(document.getElementById('clienteTelefone').value);
+        const formaPagamento = sanitizeInput(document.getElementById('formaPagamento').value);
         
         const enderecoCompleto = enderecoBase.replace(",", `, ${numeroResidencia},`);
         
@@ -427,19 +458,19 @@
         
         const totalItens = total.toFixed(2).replace('.', ',');
         const totalGeral = (total + bairroValor).toFixed(2).replace('.', ',');
-        const frete = bairroValor.toFixed(2).replace('.', ',');
+        const entrega = bairroValor.toFixed(2).replace('.', ',');
 
-        return `*Olá, Fabin Lanches!*
+        return `Olá, Fabin Lanches!
     
-✅ _Este é meu pedido de hoje:_
+✅ Segue meu pedido de hoje:
     
 ${itemsMessage}
     
-Taxa de Entrega: R$ ${frete}
-🤑 *Total do Pedido: R$ ${totalGeral}*
+Taxa de Entrega: R$ ${entrega}
+🤑 Total do Pedido: R$ ${totalGeral}
 💳 Pagamento por: ${formaPagamento}
     
-🛵 Endereço de entrega: 
+🛵 Endereço de entrega:
 ${enderecoCompleto}
 📍 Ponto de Referência: ${pontoReferencia}
 📞 Telefone: ${clienteTelefone}
@@ -447,17 +478,22 @@ ${enderecoCompleto}
 *Aguardo ansiosamente! 😋*`;
     }
 
-    // Funções de UI
-    function toggleCart() {
-        const modal = document.getElementById('cartModal');
-        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        modal.style.justifyContent = 'center';
-        modal.style.alignItems = 'center';
+    // Funções para exibição das modais
+    function showCartModal() {
+        document.getElementById('cartModal').style.display = 'flex';
     }
 
-    function closeModal() {
-        document.getElementById('cartModal').style.display = 'none';
+    function showBairrosModal() {
+        document.getElementById('bairrosModal').style.display = 'flex';
     }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Adicionando eventos para validar campos
+    document.getElementById('clienteTelefone').addEventListener('input', validateNumberInput);
+    document.getElementById('numeroInput').addEventListener('input', validateNumberInput);
 </script>
 </body>
 </html>
