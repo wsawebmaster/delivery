@@ -216,7 +216,6 @@
         <button class="close-button" onclick="closeModal('cartModal')">Fechar</button>
         <h2>Seu Carrinho</h2>
         <ul id="cartItems"></ul>
-        <div id="bairroInfo"></div>
         <div class="total" id="totalValue">Total dos Itens: R$ 0,00</div>
         <div class="total" id="entregaValue">Valor da Entrega: R$ 0,00</div>
         <div class="total" id="finalTotal">Total Geral: R$ 0,00</div>
@@ -364,7 +363,6 @@
                         const enderecoInfo = document.getElementById('enderecoInfo');
                         enderecoInfo.textContent = enderecoBase;
                         enderecoInfo.style.display = 'block';
-                        document.getElementById('bairroInfo').textContent = `Bairro: ${bairroNome}`;
                     } else {
                         alert("Não entregamos no bairro informado.");
                         resetAddressInfo();
@@ -385,7 +383,6 @@
         bairroValor = 0;
         enderecoBase = "";
         document.getElementById('enderecoInfo').style.display = 'none';
-        document.getElementById('bairroInfo').textContent = '';
         document.getElementById('cepInput').value = '';
     }
 
