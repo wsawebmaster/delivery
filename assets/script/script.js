@@ -270,15 +270,77 @@ ${enderecoCompleto}
 
     // Funções para exibição das modais
     function showCartModal() {
-        document.getElementById('cartModal').style.display = 'flex';
+        const modal = document.getElementById('cartModal');
+        modal.style.display = 'flex';
+        attachModalCloseHandlers(modal);
     }
 
     function showBairrosModal() {
-        document.getElementById('bairrosModal').style.display = 'flex';
+        const modal = document.getElementById('bairrosModal');
+        modal.style.display = 'flex';
+        attachModalCloseHandlers(modal);
     }
 
     function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        modal.style.display = 'none';
+        detachModalCloseHandlers(modal);
+    }
+
+    // Helper: attach click on overlay (outside .modal-content) and Escape key to close
+    // Support multiple modals: track open count and lock background scroll
+    let openModalCount = 0;
+    let scrollTopWhenModalOpened = 0;
+
+    function lockBodyScroll() {
+        scrollTopWhenModalOpened = window.scrollY || document.documentElement.scrollTop;
+        document.body.classList.add('modal-open');
+        document.body.style.top = `-${scrollTopWhenModalOpened}px`;
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('modal-open');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollTopWhenModalOpened);
+    }
+
+    function attachModalCloseHandlers(modal) {
+        if (!modal) return;
+        if (modal.__closeHandlersAttached) return;
+
+        modal.__overlayClickHandler = function (e) {
+            if (e.target === modal) {
+                closeModal(modal.id);
+            }
+        };
+        modal.addEventListener('click', modal.__overlayClickHandler);
+
+        modal.__escapeHandler = function (e) {
+            if (e.key === 'Escape') {
+                closeModal(modal.id);
+            }
+        };
+        document.addEventListener('keydown', modal.__escapeHandler);
+
+        modal.__closeHandlersAttached = true;
+
+        // Update open modal count and lock scroll when first opens
+        openModalCount += 1;
+        if (openModalCount === 1) lockBodyScroll();
+    }
+
+    function detachModalCloseHandlers(modal) {
+        if (!modal || !modal.__closeHandlersAttached) return;
+        modal.removeEventListener('click', modal.__overlayClickHandler);
+        document.removeEventListener('keydown', modal.__escapeHandler);
+        delete modal.__overlayClickHandler;
+        delete modal.__escapeHandler;
+        modal.__closeHandlersAttached = false;
+
+        // Update open modal count and unlock scroll when none remain
+        openModalCount = Math.max(0, openModalCount - 1);
+        if (openModalCount === 0) unlockBodyScroll();
     }
 
     // Adicionando eventos para validar campos
