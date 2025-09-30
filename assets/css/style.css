@@ -1,246 +1,466 @@
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f3f4f6;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        /* Categories bar (top menu) */
-        .categories {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .category-btn {
-            background: linear-gradient(180deg,#ffffff,#f1f6ff);
-            border: 1px solid #d6e4ff;
-            color: #1f6feb;
-            padding: 8px 14px;
-            border-radius: 999px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 2px 6px rgba(31,110,235,0.08);
-            transition: transform 0.12s ease, box-shadow 0.12s ease;
-        }
-        .category-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(31,110,235,0.12); }
-        .category-btn.active {
-            background: linear-gradient(180deg,#1f6feb,#1558c7);
-            color: #fff;
-            box-shadow: 0 8px 24px rgba(31,110,235,0.18);
-        }
-        #menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            flex-grow: 1;
-        }
-        .menu-item {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            height: 20vh;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        .menu-item:hover {
-            transform: translateY(-5px);
-        }
+:root {
+    --cor-branco-azulado: #dee6ff;
+    --header-height: 54px; /* default header height (mobile) */
+    --categories-height: 44px; /* reserved height for categories bar */
+}
 
-        /* When item is added to cart: subtle green background and border */
-        .menu-item.added {
-            background: linear-gradient(180deg, #e9f8ef 0%, #f6fff9 100%);
-            border: 1px solid #c8e6cc;
-            box-shadow: 0 6px 12px rgba(72, 160, 92, 0.08);
-        }
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f3f4f6;
+    margin: 0;
+    /* reserve space for header only; categories are in-flow and will push content down */
+    padding-top: calc(var(--header-height) + 8px);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-        /* Check badge bottom-right */
-        .menu-item .added-badge {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            background: transparent;
-            font-size: 18px;
-            pointer-events: none;
-        }
+/* BARRA FIXA TOPO */
+.barra__topo__md {
+    background-image: url(../images/barra-v-mobile.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height: var(--header-height);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 99999;
+}
+@media screen and (min-width: 750px) {
+    .barra__topo__md {
+        background-size: contain;
+        padding-top: .2rem;
+        padding-bottom: 1rem;
+        height: 37px;
+        /* for larger screens reduce the CSS variable so other components (sticky top) align */
+        --header-height: 37px;
+    }
+}
+.barra__topo__md>h3 {
+    text-shadow: 0px 0px 10px #DEE6FF;
+    color: var(--cor-branco-azulado);
+    font-size: 20px;
+}
 
-        /* Ensure menu-item has position relative so badge can be positioned */
-        .menu-item { position: relative; }
-        .quantity-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .quantity-controls button {
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            margin: 0 5px;
-            cursor: pointer;
-            transition: background-color 0.15s ease;
-            min-width: 36px; /* keep buttons same size */
-            text-align: center;
-        }
-        /* Plus button: keep existing blue style */
-        .quantity-controls button.plus {
-            background-color: #3498db;
-        }
-        .quantity-controls button.plus:hover {
-            background-color: #2980b9;
-        }
-        /* Minus button: red background; darker on hover */
-        .quantity-controls button.minus {
-            background-color: #e74c3c;
-        }
-        .quantity-controls button.minus:hover {
-            background-color: #c0392b;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* ensure modal overlay is above everything */
-            cursor: default;
-        }
-        /* When a modal is open, lock background scroll */
-        body.modal-open {
-            position: fixed;
-            overflow: hidden;
-            width: 100%;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 10000; /* ensure modal content is above overlay children */
-            max-height: calc(100vh - 80px);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .close-button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px;
-            cursor: pointer;
-            float: right;
-        }
-        .close-button:hover {
-            background-color: #c0392b;
-        }
-        .total {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 10px;
-        }
-        button.finalize {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 20px;
-            display: block;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-        button.finalize:hover {
-            background-color: #c0392b;
-        }
-        .bottom-menu {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .bottom-menu.show {
-            display: flex;
-        }
-        .total-value {
-            font-size: 1.2em;
-            color: #2c3e50;
-        }
-        .cart-count {
-            font-weight: 700;
-            margin-left: 12px;
-            margin-right: 12px;
-            color: #2c3e50;
-            min-width: 80px;
-            text-align: right;
-        }
-        .cart-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: none;
-        }
-        .cart-button.show {
-            display: inline-block;
-        }
-        .cart-button:hover {
-            background-color: #2980b9;
-        }
-        /* Quantity when zero: darker neutral (we'll keep value neutral) */
-        .quantity-controls span.zero {
-            color: #333;
-            font-weight: 700;
-            opacity: 0.9;
-        }
+/* TOPO MOBILE */
+.fundo__topo {
+    background-image: url(../../images/bg-topo-mobile.webp);
+    background-position: center bottom;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    min-height: 37em;
+}
 
-        /* Keep the minus button occupying space even when hidden — use visibility */
-        .quantity-controls button.minus-hidden {
-            visibility: hidden;
-            pointer-events: none; /* prevent interaction when hidden */
-        }
-        .input-field {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .bairro-list {
-            margin-top: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 10px;
-            background: #f9f9f9;
-        }
+.conteudo__topo {
+    min-height: 38em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3em 0 1.5em;
+    align-items: center;
+}
+
+/* If header needs slightly more space on very small screens */
+@media (max-width: 360px) {
+    :root {
+        --header-height: 64px;
+    }
+
+    body {
+        padding-top: calc(var(--header-height) + 8px);
+    }
+}
+
+.conteudo__topo__escrita {
+    font-family: var(--font-gilroy-extrabold);
+    color: var(--cor-branca);
+    font-size: clamp(1.9rem, 2.5vw, 80vh);
+    text-align: center;
+    padding: 0.3em 0;
+    line-height: 35px;
+    border-bottom: 1px solid var(--cor-azul-claro);
+    max-width: 11em;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Categories bar (top menu) */
+.categories-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 12px 8px;
+    position: sticky;
+    top: calc(var(--header-height));
+    height: var(--categories-height);
+    z-index: 9999; /* below header but above content */
+    background: transparent; /* removed background as requested */
+    padding: 0 0;
+}
+
+/* when the wrapper is stuck, add a subtle divider */
+.categories-wrapper.is-stuck {
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+
+.cat-nav {
+    background: #fff;
+    border: 1px solid rgba(31, 110, 235, 0.08);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(31, 110, 235, 0.06);
+    transition: transform 180ms ease, opacity 180ms ease;
+    background: linear-gradient(180deg, #ffffff, #f7fbff);
+    color: #1f6feb;
+    flex: 0 0 auto;
+}
+
+.cat-nav[aria-hidden="true"] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(0);
+}
+
+.cat-nav svg {
+    transform: translateX(0);
+}
+
+.categories {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+    padding: 0 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+    flex: 1 1 auto;
+    white-space: nowrap;
+}
+
+/* Hide horizontal scrollbar but keep scroll functionality */
+.categories::-webkit-scrollbar {
+    height: 0;
+}
+
+.categories {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* subtle shadow/transition when content moves */
+.categories {
+    transition: box-shadow 180ms ease;
+}
+
+.categories.scrolling {
+    box-shadow: inset 0 -8px 12px -8px rgba(0, 0, 0, 0.08);
+}
+
+.categories.centered {
+    justify-content: center;
+}
+
+.category-btn {
+    background: linear-gradient(180deg, #ffffff, #f1f6ff);
+    border: 1px solid #d6e4ff;
+    color: #1f6feb;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(31, 110, 235, 0.08);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 180ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: center;
+    white-space: nowrap;
+}
+
+.category-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(31, 110, 235, 0.12);
+}
+
+.category-btn.active {
+    background: linear-gradient(180deg, #1f6feb, #1558c7);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(31, 110, 235, 0.18);
+}
+
+#menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    grid-auto-rows: auto;
+    align-items: start;
+    /* ensure items align to top for consistent spacing */
+    align-content: start;
+    /* prevent grid from stretching vertically when few items */
+    /* removed flex-grow to avoid forced vertical expansion */
+}
+
+/* Make sure menu moves down when categories are stuck to avoid overlap */
+.categories-wrapper + #menu {
+    margin-top: 0;
+    transition: margin-top 200ms ease;
+}
+.categories-wrapper.is-stuck + #menu {
+    margin-top: calc(var(--categories-height));
+}
+
+.menu-item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    min-height: 110px;
+    /* fixed minimum for consistent vertical rhythm */
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+}
+
+/* When item is added to cart: subtle green background and border */
+.menu-item.added {
+    background: linear-gradient(180deg, #e9f8ef 0%, #f6fff9 100%);
+    border: 1px solid #c8e6cc;
+    box-shadow: 0 6px 12px rgba(72, 160, 92, 0.08);
+}
+
+/* Check badge bottom-right */
+.menu-item .added-badge {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background: transparent;
+    font-size: 18px;
+    pointer-events: none;
+}
+
+/* Ensure menu-item has position relative so badge can be positioned */
+.menu-item {
+    position: relative;
+}
+
+.quantity-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.quantity-controls button {
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    min-width: 36px;
+    /* keep buttons same size */
+    text-align: center;
+}
+
+/* Plus button: keep existing blue style */
+.quantity-controls button.plus {
+    background-color: #3498db;
+}
+
+.quantity-controls button.plus:hover {
+    background-color: #2980b9;
+}
+
+/* Minus button: red background; darker on hover */
+.quantity-controls button.minus {
+    background-color: #e74c3c;
+}
+
+.quantity-controls button.minus:hover {
+    background-color: #c0392b;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* ensure modal overlay is above everything */
+    cursor: default;
+}
+
+/* When a modal is open, lock background scroll */
+body.modal-open {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+    /* ensure modal content is above overlay children */
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.close-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    float: right;
+}
+
+.close-button:hover {
+    background-color: #c0392b;
+}
+
+.total {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+button.finalize {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 20px;
+    display: block;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+button.finalize:hover {
+    background-color: #c0392b;
+}
+
+.bottom-menu {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bottom-menu.show {
+    display: flex;
+}
+
+.total-value {
+    font-size: 1.2em;
+    color: #2c3e50;
+}
+
+.cart-count {
+    font-weight: 700;
+    margin-left: 12px;
+    margin-right: 12px;
+    color: #2c3e50;
+    min-width: 80px;
+    text-align: right;
+}
+
+.cart-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: none;
+}
+
+.cart-button.show {
+    display: inline-block;
+}
+
+.cart-button:hover {
+    background-color: #2980b9;
+}
+
+/* Quantity when zero: darker neutral (we'll keep value neutral) */
+.quantity-controls span.zero {
+    color: #333;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+/* Keep the minus button occupying space even when hidden — use visibility */
+.quantity-controls button.minus-hidden {
+    visibility: hidden;
+    pointer-events: none;
+    /* prevent interaction when hidden */
+}
+
+.input-field {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.bairro-list {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    background: #f9f9f9;
+}

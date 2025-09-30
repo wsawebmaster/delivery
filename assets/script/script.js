@@ -378,25 +378,104 @@ ${enderecoCompleto}
         initQuantityControls();
     });
 
+    // Setup a simple sticky detector: toggles .is-stuck on the categories wrapper
+    function setupStickyCategories() {
+        const wrapper = document.querySelector('.categories-wrapper');
+        if (!wrapper) return;
+
+        const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 54;
+        const threshold = wrapper.getBoundingClientRect().top + window.scrollY - headerHeight;
+
+        function checkSticky() {
+            if (window.scrollY >= threshold) {
+                wrapper.classList.add('is-stuck');
+            } else {
+                wrapper.classList.remove('is-stuck');
+            }
+        }
+
+        const debouncedCheck = debounce(checkSticky, 50);
+        window.addEventListener('scroll', debouncedCheck, { passive: true });
+        window.addEventListener('resize', debounce(() => {
+            // recompute threshold on resize
+            setTimeout(setupStickyCategories, 80);
+        }, 80));
+
+        // initial check
+        checkSticky();
+    }
+
+    // Ensure sticky setup runs after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        setupStickyCategories();
+    });
+
     /* --- dynamic menu generator (keeps current changeQuantity API) --- */
     const menuData = [
         {
-            id: 'lanches',
-            title: 'Lanches',
+            id: 'hamburguer',
+            title: 'Hamburguer',
             items: [
-                { name: 'X Burgu\u00ear', price: 12 },
-                { name: 'X Egg Bacon', price: 16 },
+                { name: 'X Burguer', price: 13 },
+                { name: 'X Egg', price: 16 },
+                { name: 'X Bacon', price: 23 },
+                { name: 'X Egg Bacon', price: 25 },
                 { name: 'X Salada', price: 17 },
                 { name: 'X Salada Egg', price: 20 },
+                { name: 'X Salada Bacon', price: 25 },
+                { name: 'X Salada Egg Bacon', price: 27 },
                 { name: 'X Tudo', price: 28 }
+            ]
+        },
+        {
+            id: 'especiais',
+            title: 'Especiais',
+            items: [
+                { name: 'Carne & Queijo Tradicional', price: 33 },
+                { name: 'Hot Dot do Fabin', price: 15 }
             ]
         },
         {
             id: 'hot-dog',
             title: 'Hot dog',
             items: [
-                { name: 'Hot Dog Simples', price: 8 },
-                { name: 'Hot Dog Completo', price: 12 }
+                { name: 'Hot Dog Simples', price: 12 },
+                { name: 'Hot Dog Salada', price: 16 },
+                { name: 'Hot Dog Pizza', price: 18 },
+                { name: 'Hot Dog Bacon', price: 21 },
+                { name: 'Hot Dog Salada Bacon', price: 22 },
+                { name: 'Hot Dog Calabresa', price: 22 },
+                { name: 'Hot Dog Tudo', price: 25 }
+            ]
+        },
+        {
+            id: 'vegetarianos',
+            title: 'Vegetarianos',
+            items: [
+                { name: 'Vegetariano Salada Rúcula', price: 18 },
+                { name: 'Vegetariano Salada Egg Rúcula', price: 20 },
+                { name: 'Vegetariano Tudo', price: 30 }
+            ]
+        },
+        {
+            id: 'adicionais',
+            title: 'Adicionais',
+            items: [
+                { name: 'Conntra Filé Noa', price: 14 },
+                { name: 'Linguiça de Dumont', price: 12 },
+                { name: 'Calabresa', price: 10 },
+                { name: 'Frango', price: 13 },
+                { name: 'Hamburguer', price: 8 },
+                { name: 'Presunto', price: 4 },
+                { name: 'Salsicha', price: 3 },
+                { name: 'Ovo', price: 2 },
+                { name: 'Queijo', price: 8 },
+                { name: 'Catupiry', price: 7 },
+                { name: 'Cheddar', price: 7 },
+                { name: 'Salada', price: 3 },
+                { name: 'Cebola', price: 2 },
+                { name: 'Batata Palha', price: 3 },
+                { name: 'Bacon', price: 8 },
             ]
         },
         {
@@ -404,7 +483,11 @@ ${enderecoCompleto}
             title: 'Refrigerantes',
             items: [
                 { name: 'Coca-Cola 350ml', price: 5 },
-                { name: 'Guaran\u00e1 350ml', price: 5 }
+                { name: 'Guaraná 350ml', price: 5 },
+                { name: 'Sprite 2l', price: 10 },
+                { name: 'Coca-Cola 2l', price: 10 },
+                { name: 'Fanta Laranja 2l', price: 10 },
+                { name: 'Fanta Uva 2l', price: 10 },
             ]
         }
     ];
@@ -426,10 +509,14 @@ ${enderecoCompleto}
                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 renderMenu();
+                // Center the clicked category in the scroll view for nicer UX
+                centerElementInScroll(btn);
             });
             if (cat.id === activeCategory) btn.classList.add('active');
             bar.appendChild(btn);
         });
+        // After categories render, setup navigation arrows and responsive behavior
+        setTimeout(setupCategoryNav, 30);
     }
 
     function renderMenu() {
@@ -498,4 +585,141 @@ ${enderecoCompleto}
 
         // After rendering, ensure controls initial state is set
         initQuantityControls();
+        // After menu renders, ensure category bar layout is updated
+        setTimeout(setupCategoryNav, 50);
+    }
+
+    /* Helpers for category navigation */
+    function centerElementInScroll(el) {
+        if (!el) return;
+        const container = document.getElementById('categoriesBar');
+        if (!container) return;
+        const containerRect = container.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const offset = (elRect.left + elRect.right) / 2 - (containerRect.left + containerRect.right) / 2;
+        // Smooth scroll by offset (negate because scrollLeft increases to the right)
+        container.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+
+    function debounce(fn, wait) {
+        let t;
+        return function () {
+            clearTimeout(t);
+            const args = arguments;
+            t = setTimeout(() => fn.apply(this, args), wait);
+        };
+    }
+
+    function setupCategoryNav() {
+        const wrapper = document.querySelector('.categories-wrapper');
+        const container = document.getElementById('categoriesBar');
+        const prev = document.getElementById('catPrev');
+        const next = document.getElementById('catNext');
+        if (!container || !wrapper || !prev || !next) return;
+
+        // Determine if content overflows
+        const isOverflowing = container.scrollWidth > container.clientWidth + 2;
+        if (!isOverflowing) {
+            container.classList.add('centered');
+            prev.setAttribute('aria-hidden', 'true');
+            next.setAttribute('aria-hidden', 'true');
+            return;
+        }
+
+        container.classList.remove('centered');
+
+        // Show/hide arrows based on scroll position
+        function updateArrows() {
+            const atStart = container.scrollLeft <= 2;
+            const atEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 2;
+            prev.setAttribute('aria-hidden', atStart ? 'true' : 'false');
+            next.setAttribute('aria-hidden', atEnd ? 'true' : 'false');
+        }
+
+        // Smooth animated centering to next/previous category for a nicer feel
+        function smoothScrollTo(targetX, duration = 480) {
+            const startX = container.scrollLeft;
+            const delta = targetX - startX;
+            const startTime = performance.now();
+
+            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(1, elapsed / duration);
+                const eased = easeOutCubic(progress);
+                container.scrollLeft = Math.round(startX + delta * eased);
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function centerElementAnimated(el) {
+            if (!el) return;
+            const containerRect = container.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            const elCenter = elRect.left + elRect.width / 2;
+            const containerCenter = containerRect.left + containerRect.width / 2;
+            const offset = elCenter - containerCenter;
+            const targetScroll = container.scrollLeft + offset;
+            smoothScrollTo(targetScroll, 480);
+        }
+
+        function findNextPrev(direction) {
+            const buttons = Array.from(container.querySelectorAll('.category-btn'));
+            if (!buttons.length) return null;
+            // find the button whose center is closest to the container center in the given direction
+            const containerRect = container.getBoundingClientRect();
+            const centerX = containerRect.left + containerRect.width / 2;
+            const visible = buttons.filter(b => {
+                const r = b.getBoundingClientRect();
+                // treat any visible portion as eligible
+                return r.right > containerRect.left + 2 && r.left < containerRect.right - 2;
+            });
+
+            if (direction === 'next') {
+                // choose first visible button whose center is > container center
+                for (const b of buttons) {
+                    const r = b.getBoundingClientRect();
+                    const bCenter = r.left + r.width / 2;
+                    if (bCenter > centerX + 2) return b;
+                }
+                // fallback: last button
+                return buttons[buttons.length - 1];
+            } else {
+                // prev: choose last visible button whose center is < container center
+                for (let i = buttons.length - 1; i >= 0; i--) {
+                    const r = buttons[i].getBoundingClientRect();
+                    const bCenter = r.left + r.width / 2;
+                    if (bCenter < centerX - 2) return buttons[i];
+                }
+                // fallback: first button
+                return buttons[0];
+            }
+        }
+
+        prev.onclick = () => {
+            const target = findNextPrev('prev');
+            if (target) centerElementAnimated(target);
+        };
+        next.onclick = () => {
+            const target = findNextPrev('next');
+            if (target) centerElementAnimated(target);
+        };
+
+        // When a category button receives focus, center it
+        container.querySelectorAll('.category-btn').forEach(b => {
+            b.addEventListener('focus', () => centerElementInScroll(b));
+        });
+
+        // Update arrows initially and on scroll/resize
+        updateArrows();
+        const debouncedUpdate = debounce(updateArrows, 60);
+        container.removeEventListener('scroll', debouncedUpdate);
+        container.addEventListener('scroll', debouncedUpdate);
+        window.removeEventListener('resize', debouncedUpdate);
+        window.addEventListener('resize', debounce(() => {
+            // re-evaluate overflow on resize
+            setTimeout(setupCategoryNav, 80);
+        }, 80));
     }
